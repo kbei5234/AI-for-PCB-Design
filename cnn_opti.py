@@ -14,8 +14,10 @@ import time
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import r2_score
 from cnn_model import train_model, X_train, y_train, X_test, y_test
+
+
+
 # Function to visualize the data
 def plot_imgs(images, labels=None):
    subplots_x = int(math.ceil(len(images) / 5))
@@ -33,21 +35,28 @@ def plot_imgs(images, labels=None):
 def opti(cnn_model):
    #STEP 2
    sgd_optimizer = keras.optimizers.SGD(learning_rate = 0.1)
-   
-   
    #STEP 3
-   loss_fn = keras.losses.MeanSquaredError()
+   loss_fn = keras.losses.SparseCategoricalCrossentropy(from_logits = False)
+  
+  
   
   
    #STEP 4
-   cnn_model.compile(optimizer = sgd_optimizer, loss = loss_fn)
+   cnn_model.compile(optimizer = sgd_optimizer, loss = loss_fn, metrics = ['accuracy'])
+  
+  
   
   
    #STEP 5
-   num_epochs = 1 # Number of epochs
+   num_epochs = 5 # Number of epochs
    t0 = time.time() # start time
   
-   history = cnn_model.fit(X_train, y_train, epochs = num_epochs, validation_split=0.2)
+  
+  
+  
+   history = cnn_model.fit(X_train, y_train, epochs = num_epochs)
+   
+   
    
    t1 = time.time() # stop time
    
@@ -57,36 +66,34 @@ def opti(cnn_model):
   
   
    #STEP 6
-   MSE = cnn_model.evaluate(X_test, y_test)
-   RMSE = np.sqrt(MSE)
-   
-   print('Loss: MSE = ', str(MSE), 'RMSE = ', str(RMSE))
-   
-   # STEP 7
-   prediction = cnn_model.predict(X_test)
-   r2 = r2_score(y_test, prediction)
-   print('R²: ', str(r2))
-   
-   
-   
-   
-   # Plot training and validation loss
-   #plt.plot(range(1, num_epochs + 1), np.sqrt(history.history['loss']), label='Training RMSE')
-   #plt.plot(range(1, num_epochs + 1), np.sqrt(history.history['val_loss']), label='Validation RMSE')
-
+   loss, accuracy = cnn_model.evaluate(X_test, y_test)
+  
+   print('Loss: ', str(loss) , 'Accuracy: ', str(accuracy))
+  
+   # Plot training loss and accuracy
+   #plt.plot(range(1, num_epochs + 1), history.history['loss'], label='Training Loss')
+  
    #plt.xlabel('Epoch')
-   #plt.ylabel('RMSE')
+   #plt.ylabel('Loss')
    #plt.legend()
    #plt.show()
-   
+  
+   # Plot training accuracy
+   #plt.plot(range(1, num_epochs + 1), history.history['accuracy'], label='Training Accuracy')
+  
+   #plt.xlabel('Epoch')
+   #plt.ylabel('Accuracy')
+   #plt.legend()
+   #plt.show()
+
 
 #display the test sets
 def display():
    # Make predictions on the test set
    logits = cnn_model.predict(X_test)
-   #predictions = logits.argmax(axis = 1) #good for classification    
+   predictions = logits.argmax(axis = 1)   
    ## Plot individual predictions
-   plot_imgs(X_test, logits)
+   plot_imgs(X_test[:25], predictions[:25])
 
 
 # change kernel sizes
@@ -107,10 +114,4 @@ for strides in strides_values:
    display()
 
 
-  
 
-  
-  
-  
-  
-   

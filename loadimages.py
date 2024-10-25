@@ -11,9 +11,8 @@ label_file = '/Users/yzy/Documents/goodchip/labels.csv' # change the path based 
 
 
 # Load the CSV file using pandas
-labels_df = pd.read_csv(label_file)
+labels_df = pd.read_csv(label_file, header=None) #header param makes sure t0 is read
 labels_df = labels_df.reset_index()
-
 
 # image size for resizing
 image_size = (400, 400)
@@ -21,7 +20,6 @@ image_size = (400, 400)
 
 image_list = []
 label_list = []
-
 
 for index, row in labels_df.iterrows():
    file_name = row.iloc[1]  # the filename from the CSV
@@ -64,7 +62,14 @@ for index, row in labels_df.iterrows():
 
 # change the lists to a numpy array
 X = np.array(image_list)  # Images
-y = np.array(label_list)  # Labels
+chip_list = [] #convert into binary
+for label in label_list:
+    if label > 0.5:
+        chip = 0 #bad
+    else:
+        chip = 1 #good
+    chip_list.append(chip)
+y = np.array(chip_list)  # good/bad
 
 
 # Check if there is an equal amount of images and labels

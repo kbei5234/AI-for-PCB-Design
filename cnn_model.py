@@ -14,8 +14,12 @@ y_data = np.load('y.npy')
 
 # Create training and test sets
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=123)
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, test_size=0.2, random_state=1234)
 
+#normalize pixel values 
+X_train = X_train/ 255
+X_test = X_test/ 255
+print(X_train)
 
 print("X_train shape:", X_train.shape)
 print("y_train.shape:", y_train.shape)
@@ -87,7 +91,7 @@ def train_model(size,strides):
   
   
    # 8. Create the output layer and add it to the model object:
-   output_layer = keras.layers.Dense(units = 1) #changed units to 1 bc regression
+   output_layer = keras.layers.Dense(units = 2, activation='softmax') #changed units to 2 for binary problem (two classes)
    cnn_model.add(output_layer)
   
   
